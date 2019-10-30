@@ -3,7 +3,7 @@
 # Assignment: Lab 4- Option B Anagrams
 # Instructor: Diego Aguirre
 # TA: Gerardo Barraza
-# Date of last modification: October 21, 2019
+# Date of last modification: October 29, 2019
 # Purpose: Compare the perfomance between AVL, Red-black, and B-trees
 
 import avl
