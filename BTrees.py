@@ -1,11 +1,3 @@
-# Code to implement a B-tree
-# Programmed by Olac Fuentes
-# Modified by Diego Aguirre on October 9, 2019
-
-
-import matplotlib.pyplot as plt
-
-
 class BTreeNode:
     # Constructor
     def __init__(self, keys=[], children=[], is_leaf=True, max_num_keys=5):
@@ -66,8 +58,10 @@ class BTree:
             left_child = BTreeNode(node.keys[:mid], max_num_keys=node.max_num_keys)
             right_child = BTreeNode(node.keys[mid + 1:], max_num_keys=node.max_num_keys)
         else:
-            left_child = BTreeNode(node.keys[:mid], node.children[:mid + 1], node.is_leaf, max_num_keys=node.max_num_keys)
-            right_child = BTreeNode(node.keys[mid + 1:], node.children[mid + 1:], node.is_leaf, max_num_keys=node.max_num_keys)
+            left_child = BTreeNode(node.keys[:mid], node.children[:mid + 1], node.is_leaf,
+                                   max_num_keys=node.max_num_keys)
+            right_child = BTreeNode(node.keys[mid + 1:], node.children[mid + 1:], node.is_leaf,
+                                    max_num_keys=node.max_num_keys)
         return node.keys[mid], left_child, right_child
 
     def insert_leaf(self, i, node=None):
@@ -108,32 +102,11 @@ class BTree:
             return 0
         return 1 + self.height(node.children[0])
 
-    def print(self, node=None):
-        # Prints keys in tree in ascending order
-        if node is None:
-            node = self.root
-
-        if node.is_leaf:
-            for t in node.keys:
-                print(t, end=' ')
-        else:
-            for i in range(len(node.keys)):
-                self.print(node.children[i])
-                print(node.keys[i], end=' ')
-            self.print(node.children[len(node.keys)])
-
-    def print_d(self, space, node=None):
-        if node is None:
-            node = self.root
-        # Prints keys and structure of B-tree
-        if node.is_leaf:
-            for i in range(len(node.keys) - 1, -1, -1):
-                print(space, node.keys[i])
-        else:
-            self.print_d(space + '   ', node.children[len(node.keys)])
-            for i in range(len(node.keys) - 1, -1, -1):
-                print(space, node.keys[i])
-                self.print_d(space + '   ', node.children[i])
+    def contains(self, k):
+        result = self.search(k)
+        if result is None:
+            return False
+        return True
 
     def search(self, k, node=None):
         if node is None:
@@ -157,68 +130,15 @@ class BTree:
             d = (dx[node.children[0].keys[0]] + dx[node.children[-1].keys[0]] + 10 * len(node.children[-1].keys)) / 2
             dx[node.keys[0]] = d - 10 * len(node.keys) / 2
 
-    def _draw_btree(self, dx, y, y_inc, fs, ax, node=None):
+    def print_d(self, space, node=None):
         if node is None:
             node = self.root
-        # Function to display b-tree to the screen
-        # It works fine for trees with up to about 70 keys
-        xs = dx[node.keys[0]]
+        # Prints keys and structure of B-tree
         if node.is_leaf:
-            for itm in node.keys:
-                ax.plot([xs, xs + 10, xs + 10, xs, xs], [y, y, y - 10, y - 10, y], linewidth=1, color='k')
-                ax.text(xs + 5, y - 5, str(itm), ha="center", va="center", fontsize=fs)
-                xs += 10
+            for i in range(len(node.keys) - 1, -1, -1):
+                print(space, node.keys[i])
         else:
-            for i in range(len(node.keys)):
-                xc = dx[node.children[i].keys[0]] + 5 * len(node.children[i].keys)
-                ax.plot([xs, xs + 10, xs + 10, xs, xs], [y, y, y - 10, y - 10, y], linewidth=1, color='k')
-                ax.text(xs + 5, y - 5, str(node.keys[i]), ha="center", va="center", fontsize=fs)
-                ax.plot([xs, xc], [y - 10, y - y_inc], linewidth=1, color='k')
-                self._draw_btree(dx, y - y_inc, y_inc, fs, ax, node.children[i])
-                xs += 10
-            xc = dx[node.children[-1].keys[0]] + 5 * len(node.children[-1].keys)
-            ax.plot([xs, xc], [y - 10, y - y_inc], linewidth=1, color='k')
-            self._draw_btree(dx, y - y_inc, y_inc, fs, ax, node.children[-1])
-
-    def draw(self):
-        # Find x-coordinates of leaves
-        ll = self.leaves()
-        dx = {}
-        d = 0
-        for l in ll:
-            dx[l[0]] = d
-            d += 10 * (len(l) + 1)
-            # Find x-coordinates of internal nodes
-        self._set_x(dx)
-        # plt.close('all')
-        fig, ax = plt.subplots()
-        self._draw_btree(dx, 0, 30, 10, ax)
-        ax.set_aspect(1.0)
-        ax.axis('off')
-        plt.show()
-
-
-def main():
-    plt.close('all')
-    tree = BTree(max_num_keys=3)
-
-    nums = [6, 3, 16, 11, 7, 17, 14, 8, 5, 19, 15, 1, 2, 4, 18, 13, 9, 20, 10, 12, 21]
-
-    for num in nums:
-        tree.insert(num)
-        tree.draw()
-
-    print('Keys in the tree: ')
-    tree.print()
-    print()
-
-    print('Tree structure')
-    tree.print_d('')
-    tree.draw()
-
-
-if __name__ == "__main__":
-
-    main()
-
-
+            self.print_d(space + '   ', node.children[len(node.keys)])
+            for i in range(len(node.keys) - 1, -1, -1):
+                print(space, node.keys[i])
+                self.print_d(space + '   ', node.children[i])
